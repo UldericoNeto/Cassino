@@ -9,66 +9,60 @@ NOTA MENTAL: 1->copas; 2->ouros; 3->paus; 4->espadas;
 
 public class Main {
     public static void main(String[] args) {
-        int op, pux, total=0;
-        List<Integer> baralho = new ArrayList<>();
-        for(int i=1; i < 11; i++){
-            for(int j=1; j<5; j++){
-                baralho.add(i);
-            }
-        }
-        String jogador;
+        int op;
         Scanner sc = new Scanner(System.in);
+        float dificuladade;
 
-        while(true){
-            System.out.print("Digite uma opcao: 1-> jogar; 2-> sair\n>> ");
+        Jogo jogo = new Jogo();
+        int[] cartas; //armazenar todas as cartas ja sorteadas
+
+        System.out.print("Digite a deficuladade do baralho:\n[1]-> Facil\n[2]-> Medio\n[3]-> Dificil\n[5]-> Sair\n>> ");
+        dificuladade = sc.nextFloat();
+        sc.nextLine();
+
+        //setar para q seja um baralho completo(1), meio(2) ou um quarto(3)
+        if(dificuladade == 1) dificuladade = 1f;
+        else if(dificuladade == 2) dificuladade = 0.5f;
+        else if(dificuladade == 3) dificuladade = 0.25f;
+        jogo.CriarBaralho(dificuladade);
+
+        //sortear as 2 primeiras cartas para começar o jogo
+        jogo.SortearCartas();
+        jogo.SortearCartas();
+        cartas = jogo.GetCartas();
+        MostrarCartas(cartas);
+
+        //loop do jogo até parar de sortear ou ter 10 na mão
+        while (true) {
+            System.out.print("Deseja puxar mais cartas? 1->sim; 2->nao\n>> ");
             op = sc.nextInt();
             sc.nextLine();
-            if(op == 2) break;
-
-            System.out.print("Digite seu nome: ");
-            jogador = sc.nextLine();
-
-
-            //SORTEAR AS CARTAS
-            Collections.shuffle(baralho);
-            int[] cartas = new int[10];
-            cartas[0] = baralho.get(0);
-            baralho.remove(0);
-            cartas[1] = baralho.get(0);
-            baralho.remove(0);
-
-            System.out.print("Cartas sorteadas: "+cartas[0]+" "+cartas[1]);
-            for(int i=2; i<11; i++){
-                System.out.print("\nDeseja puxar mais alguma carta? 1->sim; 2->nao\n>> ");
-                pux = sc.nextInt();
-                if(pux == 2) break;
-
-                Collections.shuffle(baralho);
-                cartas[i] = baralho.get(0);
-                baralho.remove(0);
-                System.out.println("Carta puxada: "+cartas[i]);
-                System.out.print("Suas cartas: ");
-                for(int j=0; j < cartas.length; j++ ){
-                    if(cartas[j] == 0) break;
-                    System.out.print(cartas[j]+" ");
-
+            if (op == 2 || jogo.CartasCompletas()) {
+                if (jogo.Resultado()) {
+                    System.out.println("Total de pontos: " + jogo.Pontuacao());
+                    System.out.println("Parabens por ganhar o jogo!");
+                    break;
+                } else {
+                    System.out.println("Total de pontos: " + jogo.Pontuacao());
+                    System.out.println("Voce perdeu!");
+                    break;
                 }
             }
-            for(int i=0; i<10; i++){
-                total = total + cartas[i];
-            }
-            System.out.println("\nTotal das cartas: " + total);
-            if(total < 21) {
-                System.out.println("Por apenas " + (21-total) + " voce não ganhou mas chegou muito perto " + jogador + ". Boa sorte na proxima vez :D");
-            } else if(total == 21) {
-                System.out.println("Parabens por conseguir um valor de 21 " + jogador + "!");
-            }else if(total > 21) {
-                System.out.println("Voce estourou a mão por " + (total-21) + " Boa sorte na proxima vez :D");
-            }
-
+            jogo.SortearCartas();
+            cartas = jogo.GetCartas();
+            MostrarCartas(cartas);
         }
 
-        //System.out.println(baralho);
         sc.close();
     }
+
+    private static void MostrarCartas(int[] cartas){
+        System.out.print("Cartas sorteadas: ");
+        for(int i=0; i<10; i++){
+            if(cartas[i] == 0) break;
+            System.out.print(cartas[i]+" ");
+        }
+        System.out.println();
+    }
+
 }
